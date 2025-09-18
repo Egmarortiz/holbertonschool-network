@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-
 # Add/replace localhost mapping
+
 sudo sed -i '/\slocalhost$/d' /etc/hosts
 echo "127.0.0.2   localhost" | sudo tee -a /etc/hosts > /dev/null
 
