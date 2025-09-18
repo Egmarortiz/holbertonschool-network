@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Add/replace localhost mapping
+sudo sed -i '/\slocalhost$/d' /etc/hosts
+echo "127.0.0.2   localhost" | sudo tee -a /etc/hosts > /dev/null
+
+# Add/replace facebook.com mapping
+sudo sed -i '/\sfacebook.com$/d' /etc/hosts
+echo "8.8.8.8     facebook.com" | sudo tee -a /etc/hosts > /dev/null
