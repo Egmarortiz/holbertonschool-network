@@ -1,9 +1,27 @@
 #!/usr/bin/env bash
-# Add/replace localhost mapping
+# 0-change_your_home_IP
 
-sudo sed -i '/\slocalhost$/d' /etc/hosts
-echo "127.0.0.2   localhost" | sudo tee -a /etc/hosts > /dev/null
+set -euo pipefail
 
-# Add/replace facebook.com mapping
-sudo sed -i '/\sfacebook.com$/d' /etc/hosts
-echo "8.8.8.8     facebook.com" | sudo tee -a /etc/hosts > /dev/null
+HOSTS="/etc/hosts"
+TMP="$(mktemp)"
+
+# Build the new hosts file: put our mappings FIRST, then the rest without duplicates.
+{
+  echo "127.0.0.2 localhost"
+  echo "8.8.8.8 facebook.com"
+  awk '
+    {
+      # Skip any line where any field (after the IP) equals "localhost" or "facebook.com"
+      for (i=2; i<=NF; i++) {
+        if ($i == "localhost" || $i == "facebook.com") next  # skip this line
+      }
+      print
+    }
+  ' "$HOSTS"
+} > "$TMP"
+
+# Backup and overwrite WITHOUT rename-in-place
+sudo cp "$HOSTS" "${HOSTS}.bak"
+sudo sh -c "cat '$TMP' > '$HOSTS'"
+rm -f "$TMP"
